@@ -42,7 +42,7 @@ app.get('/auth/callback', async (req, res) => {
       { headers: { 'Content-Type': 'application/json' } }
     );
 
-    const token = data.access_token;
+    const token = data.access_token || data.token || JSON.stringify(data);;
 
     console.log(`\n✅ ACCESS_TOKEN GERADO!`);
     console.log(`   STORE_ID:     ${user_id}`);
