@@ -162,6 +162,41 @@ app.post('/webhook/nuvemshop', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', loja: 'usevegh.com.br', hora: new Date().toLocaleString('pt-BR') });
 });
+});
+
+app.get('/test', async (req, res) => {
+  const payload = {
+    evento: 'carrinho_abandonado',
+    loja: 'usevegh.com.br',
+    checkout_id: 99999,
+    comprador: {
+      nome: 'Cliente Teste',
+      email: 'teste@usevegh.com.br',
+      telefone: '31999999999',
+    },
+    produtos: [
+      { nome: 'Produto Teste', quantidade: 2, preco: '49.90' }
+    ],
+    financeiro: {
+      subtotal: '99.80',
+      total: '109.80',
+      moeda: 'BRL',
+    },
+    link_recuperacao: 'https://usevegh.com.br/checkout/teste',
+  };
+
+  try {
+    const response = await axios.post(LAILLA_WEBHOOK, payload, {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 10000,
+    });
+    res.json({ sucesso: true, status: response.status, resposta: response.data });
+  } catch (err) {
+    res.json({ sucesso: false, erro: err.message, resposta: err.response?.data });
+  }
+});
+
+const PORT = process.env.PORT || 8080;
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
