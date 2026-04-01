@@ -6,7 +6,7 @@ const cron    = require('node-cron');
 const app = express();
 app.use(express.json());
 
-const CLIENT_ID     = '28831';
+const CLIENT_ID = '28960';
 const CLIENT_SECRET = 'b999208d96fd491814a446f507d31edec0e1b6f4ff14aae3';
 const LAILLA_WEBHOOK = 'https://api.lailla.io/v1/webhook/custom/ca99377e-6d7b-49c7-80b6-82ded8e41318';
 const USER_AGENT    = 'UseVegh Abandoned Cart (contato@usevegh.com.br)';
