@@ -13,7 +13,7 @@ const USER_AGENT     = 'UseVegh Abandoned Cart (contato@usevegh.com.br)';
 
 const processedCheckouts = new Set();
 
-app.get('/auth/callback', async (req, res) => {
+app.get('/auth/callback', async function(req, res) {
   const code    = req.query.code;
   const user_id = req.query.user_id || CLIENT_ID;
   console.log('\n🔑 Callback recebido!');
@@ -24,22 +24,17 @@ app.get('/auth/callback', async (req, res) => {
     const response = await axios({
       method: 'post',
       url: 'https://www.nuvemshop.com.br/apps/authorize/token',
-      data: `client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&grant_type=authorization_code&code=${code}`,
+      data: 'client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET + '&grant_type=authorization_code&code=' + code,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
     const token   = response.data.access_token;
     const storeId = response.data.user_id || user_id;
     if (!token) return res.send('<h2>Token não retornado.</h2><pre>' + JSON.stringify(response.data, null, 2) + '</pre>');
     console.log('✅ SUCESSO! STORE_ID:', storeId, '| TOKEN:', token);
-    return res.send(`<html><body style="font-family:sans-serif;padding:40px;max-width:600px;margin:auto">
-      <h2>✅ Token gerado com sucesso!</h2>
-      <p>Salve nas variáveis do Railway:</p>
-      <p><strong>STORE_ID:</strong><br><input style="width:100%;padding:8px" value="${storeId}" readonly onclick="this.select()"></p>
-      <p><strong>ACCESS_TOKEN:</strong><br><input style="width:100%;padding:8px" value="${token}" readonly onclick="this.select()"></p>
-    </body></html>`);
+    return res.send('<html><body style="font-family:sans-serif;padding:40px;max-width:600px;margin:auto"><h2>✅ Token gerado com sucesso!</h2><p>Salve nas variáveis do Railway:</p><p><strong>STORE_ID:</strong><br><input style="width:100%;padding:8px" value="' + storeId + '" readonly onclick="this.select()"></p><p><strong>ACCESS_TOKEN:</strong><br><input style="width:100%;padding:8px" value="' + token + '" readonly onclick="this.select()"></p></body></html>');
   } catch (err) {
-    console.error('❌ Erro:', err.response?.data || err.message);
-    return res.send('<h2>❌ Erro</h2><pre>' + JSON.stringify(err.response?.data || err.message, null, 2) + '</pre>');
+    console.error('❌ Erro:', err.response && err.response.data || err.message);
+    return res.send('<h2>❌ Erro</h2><pre>' + JSON.stringify(err.response && err.response.data || err.message, null, 2) + '</pre>');
   }
 });
 
@@ -134,6 +129,11 @@ app.post('/webhook/nuvemshop', function(req, res) {
 
 app.get('/health', function(req, res) {
   res.json({ status: 'ok', loja: 'usevegh.com.br', hora: new Date().toLocaleString('pt-BR') });
+});
+
+app.get('/run', async function(req, res) {
+  res.json({ mensagem: 'Polling iniciado! Verifique os logs no Railway.' });
+  await runPolling();
 });
 
 app.get('/test', async function(req, res) {
